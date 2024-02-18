@@ -39,7 +39,7 @@ class DistributeHandler():
         self.consumer_service.consume(self.event_handler)
         
     def event_handler(self, events):
-        if len(events) == 0 and self.lag == 0:
+        if len(events) == 0 and self.lag <= 0:
             self.consumer_service.stop()
             return
         

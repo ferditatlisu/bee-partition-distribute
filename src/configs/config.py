@@ -19,7 +19,7 @@ class ConfigurationManager:
         self.config.key = os.getenv("KEY")
         self.config.topic = os.getenv("TOPIC")
         self.config.group_id = os.getenv("GROUP_ID")
-        self.config.time = int(datetime.utcnow().timestamp() * 1000)
+        self.config.time = int(datetime.now().timestamp() * 1000)
     
     def create_service_config(self):
         kafka_config = os.getenv("KAFKA_CONFIGS")

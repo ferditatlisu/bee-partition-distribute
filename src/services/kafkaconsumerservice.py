@@ -63,3 +63,4 @@ class KafkaConsumerService():
                     events.append(record)
                     
             execute(events)
+            self.consumer.commit()

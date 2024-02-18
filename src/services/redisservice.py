@@ -21,10 +21,10 @@ class RedisService:
     def __get_redis_sentinel_hosts(self):
         redis_config = get_config().redis
         redis_hosts = []
-        redis_port = redis_config.port
         config_redis_hosts = redis_config.host
-        for host in config_redis_hosts:
-            redis_hosts.append((host, redis_port))
+        for host_with_port in config_redis_hosts:
+            host_with_port_split = host_with_port.split(":")
+            redis_hosts.append((host_with_port_split[0], host_with_port_split[1]))
         return redis_hosts
 
 
@@ -35,7 +35,7 @@ class RedisService:
         
         return None
     
-    def set(self, key, value):
+    def set(self, key, value) -> None:
         redis_value = json.dumps(value)
         self.redis_connection.set(key, redis_value)
         
