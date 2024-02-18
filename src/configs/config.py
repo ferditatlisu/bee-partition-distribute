@@ -14,17 +14,18 @@ class ConfigurationManager:
         
         
     def create_app_config(self):
-        self.config.ignored_partitions: List[int] = os.getenv("PARTITIONS").replace(" ", "").split(",") #check is int
+        self.config.ignored_partitions: List[int] = ([int(part) for part in os.getenv("PARTITIONS").replace(" ", "").split(",")]) #check is int]
         self.config.pod_name = os.getenv("POD_NAME")
         self.config.key = os.getenv("KEY")
         self.config.topic = os.getenv("TOPIC")
         self.config.group_id = os.getenv("GROUP_ID")
-        self.config.time = datetime.now()
+        self.config.time = int(datetime.utcnow().timestamp() * 1000)
     
     def create_service_config(self):
-        kafka_config = os.getenv("KAFKA_CONFIG")
+        kafka_config = os.getenv("KAFKA_CONFIGS")
+        kafka_cluster_id = os.getenv("CLUSTER_ID")
         kafka_json = json.loads(kafka_config)
-        self.config.kafka_config = KafkaConfig(kafka_json)
+        self.config.kafka_config = KafkaConfig(kafka_json, int(kafka_cluster_id))
         
         pod_master_url = os.getenv("POD_MASTER_URL")
         self.config.master_url = pod_master_url

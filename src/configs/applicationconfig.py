@@ -18,7 +18,13 @@ class KafkaConfig:
     certificate: None | List[str]
     
     
-    def __init__(self, as_dict: Dict):
+    def __init__(self, dict_list: List[Dict], cluster_id:int):
+        as_dict: Dict = {}
+        for kafka_config in dict_list:
+            if kafka_config["id"] == cluster_id:
+                as_dict = kafka_config
+                break
+    
         self.id = as_dict["id"]
         self.name = as_dict["name"]
         self.host = as_dict["host"]
@@ -45,4 +51,4 @@ class ApplicationConfig:
     key: str
     topic: str
     group_id: str
-    time: datetime
+    time: int

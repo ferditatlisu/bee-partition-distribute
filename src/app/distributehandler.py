@@ -9,14 +9,15 @@ from src.services.kafkaproducerservice import KafkaProducerService
 from kafka.structs import TopicPartition
 
 class DistributeHandler():
-    partition_index:int 
+    partition_index: int 
     ignored_partitions: List[int]
     max_partition_number: int
     kafka_producer: KafkaProducerService
     admin_client: KafkaAdminClientService
     consumer_service: KafkaConsumerService
     config: ApplicationConfig
-    lag:int = 0
+    lag: int = 0
+    next_index: int
     
     def __init__(self, kafka_admin_clint: KafkaAdminClientService, partition_index: int, max_partition_number: int):
         self.partition_index = int(partition_index)
@@ -25,6 +26,7 @@ class DistributeHandler():
         self.ignored_partitions = self.config.ignored_partitions
         self.kafka_producer = KafkaProducerService(self.config.topic)
         self.admin_client = kafka_admin_clint
+        self.next_index = 0
         
     def handle(self):
         topic_partitions: List[TopicPartition] = []
@@ -47,28 +49,26 @@ class DistributeHandler():
             
         self.lag -= len(events)
         
-    
     def get_next_partition(self):
         while True:
             founded = self.check_index()
             if not founded:
                 break
         
-        return self.partition_index
-        
-        
+        return self.next_index
+          
     def check_index(self):
         for ignored_partition in self.ignored_partitions:
-            if self.partition_index == ignored_partition:
+            if self.next_index == ignored_partition:
                 self.increase_index()
                 return True
         
         return False
     
     def increase_index(self):
-        self.partition_index += 1
-        if self.partition_index > self.max_partition_number:
-            self.partition_index = 0
+        self.next_index += 1
+        if self.next_index > self.max_partition_number:
+            self.next_index = 0
             
     def set_lag(self, topic_partitions):
         group_offset = 0

@@ -14,7 +14,6 @@ class KafkaConsumerService():
        
     def stop(self):
         self.is_stopped = True
-        self.consumer.close()
     
     def get_consumer(self):
         return self.consumer
@@ -45,15 +44,22 @@ class KafkaConsumerService():
         self.consumer.assign(partitions)
             
     def consume(self, execute):
-        while not self.is_stopped:
+        max_date = get_config().time
+        while True:
             kafka_items: Dict[Any, list] = self.consumer.poll(timeout_ms=1000, max_records=50)
+            if self.is_stopped:
+                break
+            
             if len(kafka_items) == 0:
                 execute([])
-                break
+                continue
 
             events = []
             for key, value in kafka_items.items():
                 for record in value:
+                    if record.timestamp > max_date:
+                        self.is_stopped = True
+                    
                     events.append(record)
                     
             execute(events)
